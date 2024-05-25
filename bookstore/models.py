@@ -1,6 +1,6 @@
 # from django.contrib import admin
 # from django.conf import settings
-# from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 # from uuid import uuid4
 # from .validators import validate_file_size
@@ -25,21 +25,30 @@ from django.db import models
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
+    author = models.CharField(max_length=100)
     slug = models.SlugField()
     description = models.TextField(null=True, blank=True)
-    unit_price = models.DecimalField(
+    edition = models.CharField(max_length=50, blank=True, null=True)
+    publish_date = models.DateField()
+    genre = models.CharField(max_length=100)
+    page_count = models.IntegerField()
+    publisher = models.CharField(max_length=255)
+    language = models.CharField(max_length=50)
+    isbn = models.CharField(max_length=13, unique=True)
+    price = models.DecimalField(
         max_digits=9,
         decimal_places=2,
         validators=[MinValueValidator(1)])
     # inventory = models.IntegerField(validators=[MinValueValidator(0)])
     last_update = models.DateTimeField(auto_now=True)
-    collection = models.ForeignKey(
-        Collection, on_delete=models.PROTECT, related_name='products')
-    promotions = models.ManyToManyField(Promotion, blank=True)
+    # collection = models.ForeignKey(
+    #     Collection, on_delete=models.PROTECT, related_name='products')
+    # promotions = models.ManyToManyField(Promotion, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    file = models.FileField(upload_to='books/')
 
-    def __str__(self) -> str:
-        return self.title
+    def __str__(self):
+        return f"{self.title} ({self.edition})" if self.edition else self.title
 
     class Meta:
         ordering = ['title']
